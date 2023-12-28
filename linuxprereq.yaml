@@ -1,6 +1,6 @@
 ---
 - name: creating direcory and file
-  hosts: linux
+  hosts: local
   vars:
     timezone: "{{ timezone }}"
     prereqpath: "{{ prereqpath }}"
