@@ -1,0 +1,35 @@
+---
+- name: creating direcory and file
+  hosts: linux
+  vars:
+    timezone: "{{ timezone }}"
+    prereqpath: "{{ prereqpath }}"
+    dockerComposeFolder: "{{ dockerComposeFolder }}"
+    JDKFilename: " {{ JDKFilename }}"
+    dockerFilename: "{{ dockerFilename }}"
+    dialogFilename: "{{ dialogFilename }}"
+  tasks:
+    - name: Set TimeZone
+      shell: 
+         timedatectl set-timezone "{{ timezone }}"
+    - name: Restart chrony
+      shell: 
+         systemctl restart chronyd
+    - name: Stop firewall
+      shell: 
+         systemctl stop firewalld
+    - name: Disable firewall
+      shell: 
+         systemctl disable firewalld
+    - name: installing docker, dgialog and jdk
+      shell: |
+        cd {{ prereqpath }}
+        tar xzvf "{{ prereqpath }}/{{ dockerFilename }}"
+        cp docker/* /usr/bin/
+        cp {{ prereqpath }}/docker.s* /etc/systemd/system
+        systemctl enable docker
+        systemctl start docker
+        cp "{{ prereqpath }}/{{ dockerComposeFolder }}" /usr/sbin/docker-compose
+        chmod +x /usr/sbin/docker-compose
+        rpm -i {{ dialogFilename }}
+        rpm -ivh {{ JDKFilename }}
